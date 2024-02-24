@@ -4,11 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.*;
+import java.sql.ResultSet;
 
 public class Login  extends JFrame  implements ActionListener {
 
     JButton login, clear , signup;
-    JTextField cardTextField, pinTextField;
+    JTextField cardTextField;
+    JPasswordField pinTextField;
     Login(){
         setTitle("Automated Teller Machine");
         setLayout(null);
@@ -38,7 +40,7 @@ public class Login  extends JFrame  implements ActionListener {
         pin.setBounds(120,220,250,30);
         pin.setFont(new Font("Raleway", Font.BOLD, 28));
         add(pin);
-        pinTextField = new JTextField();
+        pinTextField = new JPasswordField();
         pinTextField.setBounds(300,220,250,30);
         add(pinTextField);
 
@@ -79,7 +81,28 @@ public class Login  extends JFrame  implements ActionListener {
             pinTextField.setText("");
 
         }  else if (ae.getSource() == login) {
+            Conn conn =  new Conn();
+            String cardnumber = cardTextField.getText();
+            String pinnumber = pinTextField.getText();
+            String query = "Select * from login where card_number = '"+cardnumber+"' and pin_number = '"+pinnumber+"'";
+            try {
+                ResultSet rs = conn.s.executeQuery(query);
+                if (cardnumber.isEmpty()){
+                    JOptionPane.showMessageDialog(null,"Please enter Card Number.");
+                }
+                else if (rs.next()) {
+                    setVisible(false);
+                    new Transactions(pinnumber).setVisible(true);
+                }
+                else {
 
+                    JOptionPane.showMessageDialog(null, "Incorrect Card Number or PIN.");
+
+                }
+            }
+            catch (Exception e){
+                System.out.println(e);
+            }
         }
         else if (ae.getSource() == signup) {
                 setVisible(false);
